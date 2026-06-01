@@ -1,0 +1,394 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#app{font-family:var(--font-sans);display:flex;flex-direction:column;gap:0;padding:1rem 0}
+
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:0 0 1rem 0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1rem}
+.app-title{display:flex;align-items:center;gap:10px}
+.app-title i{font-size:20px;color:var(--color-text-secondary)}
+.app-title span{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.app-title small{font-size:12px;color:var(--color-text-tertiary);margin-left:6px;font-weight:400}
+
+.toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:1rem;flex-wrap:wrap}
+.tb-group{display:flex;align-items:center;gap:4px}
+.tb-sep{width:0.5px;height:20px;background:var(--color-border-tertiary);margin:0 6px;flex-shrink:0}
+.tb-label{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-right:2px;white-space:nowrap}
+.tb-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:transparent;border:0.5px solid transparent;border-radius:var(--border-radius-md);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);transition:all .15s;white-space:nowrap}
+.tb-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-tertiary)}
+.tb-btn.on{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-secondary)}
+.tb-btn.accent{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.tb-btn.accent:hover{opacity:.85}
+.tb-btn.danger-soft{color:var(--color-text-danger)}
+.tb-btn.danger-soft:hover{background:var(--color-background-danger);border-color:var(--color-border-danger)}
+.tb-btn i{font-size:15px}
+.tb-btn.icon-only{padding:5px 7px}
+
+select{height:28px;padding:0 6px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:12px;cursor:pointer}
+input[type=number]{height:28px;padding:0 6px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:12px;width:52px}
+input[type=color]{width:28px;height:28px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;padding:2px;background:var(--color-background-primary)}
+
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--color-background-secondary);border-radius:20px;font-size:11px;color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);margin-left:auto;white-space:nowrap}
+.status-pill i{font-size:13px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--color-text-tertiary);flex-shrink:0}
+.status-dot.active{background:#1D9E75}
+
+.upload-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:340px;border:0.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);cursor:pointer;transition:background .15s,border-color .15s;gap:14px;background:var(--color-background-primary)}
+.upload-zone:hover{background:var(--color-background-secondary);border-color:var(--color-border-primary)}
+.upload-icon-wrap{width:56px;height:56px;border-radius:var(--border-radius-lg);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center}
+.upload-icon-wrap i{font-size:26px;color:var(--color-text-secondary)}
+.upload-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.upload-sub{font-size:12px;color:var(--color-text-tertiary)}
+.upload-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;font-size:11px;color:var(--color-text-tertiary)}
+
+#pages-container{display:flex;flex-direction:column;gap:1.5rem}
+.page-wrapper{display:flex;flex-direction:column;gap:6px}
+.page-meta{display:flex;align-items:center;gap:8px;padding:0 2px}
+.page-num{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.page-size{font-size:11px;color:var(--color-text-tertiary)}
+
+.canvas-wrap{position:relative;display:inline-block;border:0.5px solid var(--color-border-tertiary);border-radius:6px;overflow:hidden;cursor:crosshair;background:var(--color-background-primary)}
+.canvas-wrap.select-mode{cursor:default}
+canvas.pdf-layer{display:block}
+.text-layer{position:absolute;top:0;left:0;width:100%;height:100%}
+
+.txt-node{position:absolute;cursor:move;user-select:none;line-height:1.35;white-space:pre}
+.txt-node:hover .del-btn{opacity:1}
+.txt-node.selected{outline:1.5px dashed var(--color-border-info);border-radius:2px}
+.del-btn{position:absolute;top:-9px;right:-9px;width:17px;height:17px;background:var(--color-background-danger);color:var(--color-text-danger);border:none;border-radius:50%;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;z-index:20;padding:0}
+.txt-node.selected .del-btn{opacity:1}
+.txt-inline{position:absolute;background:transparent;border:none;outline:1.5px dashed var(--color-border-info);border-radius:2px;min-width:60px;line-height:1.35;resize:none;overflow:hidden;z-index:30;padding:0;font-family:inherit}
+
+.prog-bar{height:2px;background:var(--color-border-tertiary);border-radius:2px;overflow:hidden;margin-bottom:1rem;opacity:0;transition:opacity .2s}
+.prog-bar.visible{opacity:1}
+.prog-fill{height:100%;background:#185FA5;border-radius:2px;transition:width .25s;width:0%}
+
+.page-ruler{display:flex;align-items:center;gap:8px;margin-top:2px}
+.ruler-line{flex:1;height:0.5px;background:var(--color-border-tertiary)}
+</style>
+
+<div id="app">
+  <h2 class="sr-only">Editor profissional de PDF — adicione e remova textos nas páginas</h2>
+
+  <div class="app-header">
+    <div class="app-title">
+      <i class="ti ti-file-text" aria-hidden="true"></i>
+      <span>Editor de PDF <small>— anotações e textos</small></span>
+    </div>
+    <button class="tb-btn accent" id="save-btn" onclick="savePDF()" style="display:none">
+      <i class="ti ti-download" aria-hidden="true"></i> Exportar PDF
+    </button>
+  </div>
+
+  <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+
+  <div class="toolbar" id="toolbar" style="display:none">
+    <div class="tb-group">
+      <span class="tb-label">modo</span>
+      <button class="tb-btn on" id="btn-text" onclick="setMode('text')">
+        <i class="ti ti-cursor-text" aria-hidden="true"></i> Inserir texto
+      </button>
+      <button class="tb-btn" id="btn-select" onclick="setMode('select')">
+        <i class="ti ti-pointer" aria-hidden="true"></i> Selecionar
+      </button>
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <div class="tb-group">
+      <span class="tb-label">fonte</span>
+      <select id="font-family">
+        <option value="Arial">Arial</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Helvetica">Helvetica</option>
+      </select>
+      <input type="number" id="font-size" value="16" min="6" max="120" title="Tamanho">
+      <input type="color" id="font-color" value="#000000" title="Cor">
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <div class="tb-group">
+      <button class="tb-btn icon-only" onclick="undoLast()" title="Desfazer última ação">
+        <i class="ti ti-arrow-back-up" aria-hidden="true"></i>
+      </button>
+      <button class="tb-btn danger-soft" onclick="clearAll()" title="Remover todos os textos">
+        <i class="ti ti-trash" aria-hidden="true"></i> Limpar
+      </button>
+    </div>
+
+    <div class="status-pill" id="status-pill">
+      <span class="status-dot active" id="status-dot"></span>
+      <span id="status-text">Clique na página para adicionar texto</span>
+    </div>
+  </div>
+
+  <div id="upload-area">
+    <div class="upload-zone" onclick="document.getElementById('file-input').click()"
+      ondragover="event.preventDefault();this.style.background='var(--color-background-secondary)'"
+      ondragleave="this.style.background=''"
+      ondrop="handleDrop(event)">
+      <div class="upload-icon-wrap"><i class="ti ti-cloud-upload" aria-hidden="true"></i></div>
+      <div style="text-align:center;display:flex;flex-direction:column;gap:4px">
+        <p class="upload-title">Solte o PDF aqui ou clique para selecionar</p>
+        <p class="upload-sub">Suporta PDFs com uma ou mais páginas</p>
+      </div>
+      <span class="upload-badge"><i class="ti ti-file-type-pdf" aria-hidden="true"></i> .pdf</span>
+    </div>
+  </div>
+  <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="loadPDF(event)">
+
+  <div id="pages-container"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const SCALE=2;
+let pdfDoc=null,pages=[],mode='text',history=[];
+
+function setStatus(msg,active=true){
+  document.getElementById('status-text').textContent=msg;
+  document.getElementById('status-dot').className='status-dot'+(active?' active':'');
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('btn-text').className='tb-btn'+(m==='text'?' on':'');
+  document.getElementById('btn-select').className='tb-btn'+(m==='select'?' on':'');
+  document.querySelectorAll('.canvas-wrap').forEach(c=>{
+    c.className='canvas-wrap'+(m==='select'?' select-mode':'');
+  });
+  setStatus(m==='text'?'Clique na página para adicionar texto':'Clique em um texto para selecioná-lo');
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  e.currentTarget.style.background='';
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type==='application/pdf') readFile(f);
+}
+
+function loadPDF(e){
+  const f=e.target.files[0];
+  if(f) readFile(f);
+}
+
+function readFile(file){
+  const r=new FileReader();
+  r.onload=async ev=>{
+    document.getElementById('upload-area').style.display='none';
+    document.getElementById('toolbar').style.display='flex';
+    document.getElementById('save-btn').style.display='inline-flex';
+    setStatus('Carregando páginas…');
+    showProg(10);
+    pdfDoc=await pdfjsLib.getDocument({data:ev.target.result}).promise;
+    pages=[];history=[];
+    document.getElementById('pages-container').innerHTML='';
+    for(let i=1;i<=pdfDoc.numPages;i++){
+      await renderPage(i);
+      showProg(10+Math.round(i/pdfDoc.numPages*80));
+    }
+    showProg(100);
+    setTimeout(hideProg,600);
+    setStatus(`${pdfDoc.numPages} página(s) — clique para inserir texto`);
+  };
+  r.readAsArrayBuffer(file);
+}
+
+function showProg(v){
+  const b=document.getElementById('prog-bar');
+  b.classList.add('visible');
+  document.getElementById('prog-fill').style.width=v+'%';
+}
+function hideProg(){
+  document.getElementById('prog-bar').classList.remove('visible');
+  document.getElementById('prog-fill').style.width='0%';
+}
+
+async function renderPage(num){
+  const page=await pdfDoc.getPage(num);
+  const vp=page.getViewport({scale:SCALE});
+  const wPx=Math.round(vp.width), hPx=Math.round(vp.height);
+  const dispW=Math.round(wPx/SCALE), dispH=Math.round(hPx/SCALE);
+
+  const wrapper=document.createElement('div');
+  wrapper.className='page-wrapper';
+
+  const meta=document.createElement('div');
+  meta.className='page-meta';
+  meta.innerHTML=`<span class="page-num">Página ${num}</span><span class="page-size">${dispW} × ${dispH} px</span>`;
+
+  const wrap=document.createElement('div');
+  wrap.className='canvas-wrap';
+  wrap.style.width=wPx+'px';
+  wrap.dataset.page=num;
+
+  const canvas=document.createElement('canvas');
+  canvas.className='pdf-layer';
+  canvas.width=wPx;canvas.height=hPx;
+  canvas.style.width=wPx+'px';canvas.style.height=hPx+'px';
+
+  const tl=document.createElement('div');
+  tl.className='text-layer';
+  tl.dataset.page=num;
+
+  wrap.appendChild(canvas);wrap.appendChild(tl);
+  wrapper.appendChild(meta);wrapper.appendChild(wrap);
+  document.getElementById('pages-container').appendChild(wrapper);
+
+  await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+  pages[num]={canvas,tl,vp,items:[]};
+
+  wrap.addEventListener('click',function(e){
+    if(mode!=='text') return;
+    if(e.target.closest('.txt-node')||e.target.closest('.txt-inline')) return;
+    const r=wrap.getBoundingClientRect();
+    startInput(num,e.clientX-r.left,e.clientY-r.top);
+  });
+}
+
+function startInput(pn,x,y){
+  const {tl}=pages[pn];
+  const ff=document.getElementById('font-family').value;
+  const fs=parseInt(document.getElementById('font-size').value);
+  const fc=document.getElementById('font-color').value;
+  const inp=document.createElement('textarea');
+  inp.className='txt-inline';
+  inp.style.cssText=`left:${x}px;top:${y}px;font-family:${ff};font-size:${fs}px;color:${fc};min-width:80px`;
+  inp.rows=1;tl.appendChild(inp);inp.focus();
+  inp.addEventListener('input',function(){
+    this.style.height='auto';this.style.height=this.scrollHeight+'px';
+    this.style.width='auto';this.style.width=Math.max(80,this.scrollWidth)+'px';
+  });
+  inp.addEventListener('blur',function(){
+    const v=this.value.trim();tl.removeChild(inp);
+    if(v) addNode(pn,x,y,v,ff,fs,fc);
+  });
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){this.value='';this.blur();}
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.blur();}
+  });
+}
+
+function addNode(pn,x,y,text,ff,fs,fc){
+  const {tl,items}=pages[pn];
+  const id='n'+Date.now();
+  const el=document.createElement('div');
+  el.className='txt-node';el.id=id;
+  el.style.cssText=`left:${x}px;top:${y}px;font-family:${ff};font-size:${fs}px;color:${fc}`;
+  el.textContent=text;
+
+  const d=document.createElement('button');
+  d.className='del-btn';d.title='Remover';
+  d.innerHTML='<i class="ti ti-x" aria-hidden="true"></i>';
+  d.addEventListener('click',e=>{
+    e.stopPropagation();
+    el.remove();
+    const i=items.findIndex(n=>n.id===id);
+    if(i>-1) items.splice(i,1);
+    setStatus('Texto removido');
+  });
+  el.appendChild(d);
+  makeDraggable(el,pn);
+
+  el.addEventListener('click',function(e){
+    if(mode==='select'){
+      document.querySelectorAll('.txt-node.selected').forEach(n=>n.classList.remove('selected'));
+      this.classList.add('selected');
+    }
+  });
+
+  tl.appendChild(el);
+  const entry={id,x,y,text,ff,fs,fc};
+  items.push(entry);
+  history.push({pn,id,entry,el});
+  setStatus('Texto inserido — arraste para reposicionar');
+}
+
+function makeDraggable(el,pn){
+  let ox,oy,sx,sy,on=false;
+  el.addEventListener('mousedown',e=>{
+    if(e.target.closest('.del-btn')) return;
+    on=true;sx=e.clientX;sy=e.clientY;
+    ox=parseInt(el.style.left)||0;oy=parseInt(el.style.top)||0;
+    e.stopPropagation();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!on) return;
+    el.style.left=(ox+e.clientX-sx)+'px';el.style.top=(oy+e.clientY-sy)+'px';
+  });
+  document.addEventListener('mouseup',()=>{
+    if(on){
+      on=false;
+      const item=pages[pn].items.find(i=>i.id===el.id);
+      if(item){item.x=parseInt(el.style.left);item.y=parseInt(el.style.top);}
+    }
+  });
+}
+
+function undoLast(){
+  const last=history.pop();
+  if(!last){setStatus('Nada para desfazer',false);return;}
+  last.el.remove();
+  const items=pages[last.pn].items;
+  const i=items.findIndex(n=>n.id===last.id);
+  if(i>-1) items.splice(i,1);
+  setStatus('Ação desfeita');
+}
+
+function clearAll(){
+  if(!confirm('Remover todos os textos adicionados?')) return;
+  Object.values(pages).forEach(p=>{
+    if(!p) return;
+    p.tl.querySelectorAll('.txt-node').forEach(el=>el.remove());
+    p.items=[];
+  });
+  history=[];
+  setStatus('Todos os textos foram removidos',false);
+}
+
+async function savePDF(){
+  if(!pdfDoc) return;
+  showProg(5);
+  setStatus('Gerando PDF…');
+  try{
+    const {jsPDF}=window.jspdf;
+    let pdf=null;
+    for(let num=1;num<=pdfDoc.numPages;num++){
+      const{canvas,tl,vp,items}=pages[num];
+      showProg(5+Math.round((num-1)/pdfDoc.numPages*85));
+      const off=document.createElement('canvas');
+      off.width=vp.width;off.height=vp.height;
+      const ctx=off.getContext('2d');
+      ctx.drawImage(canvas,0,0);
+      items.forEach(item=>{
+        const el=tl.querySelector('#'+item.id);
+        if(!el) return;
+        const x=parseInt(el.style.left),y=parseInt(el.style.top);
+        ctx.font=`${item.fs}px ${item.ff}`;
+        ctx.fillStyle=item.fc;
+        ctx.textBaseline='top';
+        item.text.split('\n').forEach((line,i)=>ctx.fillText(line,x,y+i*item.fs*1.35));
+      });
+      const img=off.toDataURL('image/jpeg',1.0);
+      const mmW=vp.width*25.4/96,mmH=vp.height*25.4/96;
+      if(!pdf){
+        pdf=new jsPDF({orientation:mmW>mmH?'l':'p',unit:'mm',format:[mmW,mmH],compress:false});
+      }else{
+        pdf.addPage([mmW,mmH],mmW>mmH?'l':'p');
+      }
+      pdf.addImage(img,'JPEG',0,0,mmW,mmH,undefined,'FAST');
+    }
+    showProg(100);setTimeout(hideProg,600);
+    pdf.save('documento_editado.pdf');
+    setStatus('PDF exportado com sucesso');
+  }catch(err){
+    hideProg();
+    setStatus('Erro ao exportar: '+err.message,false);
+  }
+}
+</script>
